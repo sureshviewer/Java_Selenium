@@ -1,0 +1,121 @@
+// NUnit 3 tests
+// See documentation : https://github.com/nunit/docs/wiki/NUnit-Documentation
+using NUnit.Framework;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
+using System.Collections;
+using System.Collections.Generic;
+using System;
+using System.Threading;
+
+namespace SelExam_Csharp
+{
+    [TestFixture]
+    public class TestClass
+    {
+
+        IWebDriver driver;
+        string path = @"C:\Users\jaddida.ravikumar\Downloads\chromedriver_win32 (5)";
+       [SetUp]
+       public void setup()
+        {
+            driver = new ChromeDriver(path);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            
+
+        }
+        
+        
+        [Test]
+        public void TestMethod()
+        {
+            driver.Url = "http://www.google.com";
+            driver.Manage().Window.Maximize();
+            driver.FindElement(By.LinkText("BMI calculator")).Click();
+            driver.FindElement(By.Id("weight1")).SendKeys("60");
+            driver.FindElement(By.Id("calbmi")).Click();
+            var err = driver.FindElement(By.Id("perror"));
+            if (err.Displayed == true)
+            {
+                Console.WriteLine("Displayed error message is:{0}",err.Text);
+            }
+            driver.Navigate().Refresh();
+            driver.FindElement(By.Id("reset1")).Click();
+            driver.FindElement(By.Id("weight1")).SendKeys("50");
+            driver.FindElement(By.Id("height1")).SendKeys("152");
+            driver.FindElement(By.Id("calbmi")).Click();
+            Thread.Sleep(2000);
+            var bmi = driver.FindElement(By.Id("bmiq")).GetAttribute("value");
+            Console.WriteLine("Your BMI is:{0}",bmi);
+            driver.FindElement(By.LinkText("Calorie Chart")).Click();
+            driver.FindElement(By.XPath("//*[@id='bgc']/div[1]/div/label[2]/input")).Click();
+            IWebElement table = driver.FindElement(By.Id("cctable1"));
+            IWebElement tb = table.FindElement(By.Id("commonfooditems"));
+            var tr = tb.FindElements(By.TagName("tr"));
+            foreach(var n in tr)
+            {
+                var td = n.FindElements(By.TagName("td"));
+                if(td[1].Text.Contains("1 katori or 60 grams"))
+                {
+                    Console.WriteLine(td[0].Text + "\t"+td[2].Text);
+
+                }
+            }
+            
+            //dropdowns
+            driver.FindElement(By.LinkText("Calorie Calculator")).Click();
+            IWebElement dd = driver.FindElement(By.Id("dropdowncaloriecalculator"));
+            SelectElement dd1 = new SelectElement(dd);
+            var alloptions = dd1.Options;
+            Console.WriteLine("Number of dropdowns is:{0}",alloptions.Count);
+            //
+            driver.FindElement(By.LinkText("Consult Our Expert")).Click();
+            driver.Navigate().Back();
+            driver.FindElement(By.Id("age")).SendKeys("24");
+            var col= driver.FindElement(By.XPath("")).GetAttribute("color");
+            Console.WriteLine(col);
+            driver.FindElement(By.Id("foot")).SendKeys("5");
+            driver.FindElement(By.Id("inch")).SendKeys("7\"");
+            Thread.Sleep(3000);
+            var cms = driver.FindElement(By.Id("cen")).GetAttribute("value");
+            Console.WriteLine(cms);
+            driver.FindElement(By.Id("weight")).SendKeys("50");
+            driver.FindElement(By.Id("loa")).SendKeys("Moderately Active");
+            driver.FindElement(By.Id("ctcbtn")).Click();
+            IWebElement dd2 = driver.FindElement(By.Id("caltype"));
+            SelectElement ele = new SelectElement(dd2);
+            ele.SelectByText("pounds");
+            var carb = driver.FindElement(By.Id("rh")).Text;
+            var fat = driver.FindElement(By.Id("rf")).Text;
+            Console.WriteLine("Carbohydrate: {0}", carb);
+            Console.WriteLine("Fat: {0}", fat);
+            driver.FindElement(By.LinkText("Consult our Expert")).Click();
+            IWebElement diet = driver.FindElement(By.Id("sel1"));
+            SelectElement diet_obj = new SelectElement(diet);
+            var alloptionss = diet_obj.Options;
+            foreach(var n in alloptions)
+            {
+                Console.WriteLine(n.Text);
+            }
+            
+
+            Thread.Sleep(3000);
+            Assert.Pass();
+
+
+
+
+
+
+
+        }
+        [TearDown]
+        public void teardown()
+        {
+            driver.Close();
+            driver.Quit();
+            
+        }
+    }
+}
